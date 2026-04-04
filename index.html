@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#1e3a5f">
+    <title>固体物理智能题库 | 黄昆《固体物理学》</title>
+    <!-- MathJax 公式渲染库 -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+            background: #f0f2f8;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a5f, #0f2a44);
+            color: white;
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .nav-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 16px 20px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            background: #f1f5f9;
+            color: #475569;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active {
+            background: #1e3a5f;
+            color: white;
+        }
+
+        .nav-btn:hover:not(.active) {
+            background: #e2e8f0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            color: #1e3a5f;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #1e3a5f;
+        }
+
+        button {
+            padding: 12px 28px;
+            background: #1e3a5f;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #0f2a44;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 20px;
+            line-height: 1.7;
+            font-size: 16px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            min-height: 150px;
+        }
+
+        .question-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .question-item {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .question-item:hover {
+            background: #f1f5f9;
+            transform: translateX(4px);
+        }
+
+        .question-title {
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 8px;
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* 例题详情弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 24px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .modal-close:hover {
+            color: #1e3a5f;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 16px;
+            padding-right: 30px;
+        }
+
+        .modal-body {
+            line-height: 1.7;
+        }
+
+        .modal-body .question-text {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .modal-body .solution-text {
+            background: #e8f5e9;
+            padding: 16px;
+            border-radius: 16px;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .practice-question {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .practice-question .question-text {
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: white;
+            border-radius: 16px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 14px;
+            resize: vertical;
+            margin: 16px 0;
+        }
+
+        .feedback {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 16px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback-correct {
+            background: #e8f5e9;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .feedback-wrong {
+            background: #ffebee;
+            border-left: 4px solid #dc2626;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 12px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e2e8f0;
+            border-top-color: #1e3a5f;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 12px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 20px;
+        }
+
+        mjx-container {
+            font-size: 16px;
+            margin: 8px 0;
+        }
+
+        .image-preview {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .image-preview.show {
+            display: block;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔬 固体物理智能题库</h1>
+        <p>基于黄昆《固体物理学》教材 | AI智能出题 · 概念解释 · 图片判题</p>
+    </div>
+
+    <div class="nav-bar">
+        <button class="nav-btn active" onclick="switchSection('example')">📚 例题库</button>
+        <button class="nav-btn" onclick="switchSection('practice')">✏️ 刷题练习</button>
+        <button class="nav-btn" onclick="switchSection('mistakes')">📌 错题本</button>
+        <button class="nav-btn" onclick="switchSection('ai')">🤖 AI助手</button>
+    </div>
+
+    <div class="container">
+        <div id="example-section" class="content-section active">
+            <div class="card">
+                <h3>📖 经典例题</h3>
+                <div id="example-list" class="question-list"></div>
+            </div>
+        </div>
+
+        <div id="practice-section" class="content-section">
+            <div class="card">
+                <h3>✏️ 智能刷题</h3>
+                <div class="two-columns">
+                    <div>
+                        <div class="input-group">
+                            <label>选择章节</label>
+                            <select id="practice-chapter">
+                                <option value="all">全部章节</option>
+                                <option value="晶体结构">第一章 晶体结构</option>
+                                <option value="固体的结合">第二章 固体的结合</option>
+                                <option value="晶格振动">第三章 晶格振动</option>
+                                <option value="能带理论">第四章 能带理论</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>选择难度</label>
+                            <select id="practice-difficulty">
+                                <option value="easy">基础 ⭐</option>
+                                <option value="medium" selected>中等 ⭐⭐</option>
+                                <option value="hard">困难 ⭐⭐⭐</option>
+                            </select>
+                        </div>
+                        <button onclick="startPractice()">开始刷题</button>
+                        <button onclick="aiGenerateQuestion()" style="margin-left: 12px; background: #f59e0b;">🤖 AI生成题目</button>
+                    </div>
+                    <div>
+                        <div class="input-group">
+                            <label>AI生成知识点</label>
+                            <input type="text" id="ai-knowledge" placeholder="例如：布洛赫定理、声子、能带结构">
+                        </div>
+                        <div class="input-group">
+                            <label>题型</label>
+                            <select id="ai-type">
+                                <option value="计算题">计算题</option>
+                                <option value="证明题">证明题</option>
+                                <option value="简答题">简答题</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="practice-area" class="practice-area">
+                    <div style="text-align: center; padding: 40px; color: #64748b;">
+                        点击"开始刷题"或"AI生成题目"开始练习
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mistakes-section" class="content-section">
+            <div class="card">
+                <h3>📌 错题本</h3>
+                <div id="mistakes-list" class="question-list">
+                    <div style="text-align: center; padding: 40px; color: #64748b;">暂无错题</div>
+                </div>
+                <button onclick="clearMistakes()" style="margin-top: 16px; background: #dc2626;">清空错题本</button>
+            </div>
+        </div>
+
+        <div id="ai-section" class="content-section">
+            <div class="two-columns">
+                <div class="card">
+                    <h3>💬 AI对话</h3>
+                    <div class="input-group">
+                        <label>提问固体物理问题</label>
+                        <textarea id="chat-input" rows="3" placeholder="例如：请解释什么是倒格子？布洛赫定理的物理意义是什么？"></textarea>
+                    </div>
+                    <button onclick="sendChat()">发送</button>
+                    <div id="chat-result" class="result-area">等待提问...</div>
+                </div>
+                <div class="card">
+                    <h3>📖 概念解释</h3>
+                    <div class="input-group">
+                        <label>输入物理概念</label>
+                        <input type="text" id="concept-input" placeholder="例如：声子、有效质量、布里渊区">
+                    </div>
+                    <button onclick="explainConcept()">解释</button>
+                    <div id="concept-result" class="result-area">等待输入...</div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>📝 错题分析</h3>
+                <div class="input-group">
+                    <label>错题描述</label>
+                    <textarea id="mistake-question" rows="2" placeholder="请输入做错的题目..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>你的答案</label>
+                    <input type="text" id="mistake-user-answer" placeholder="你的答案">
+                </div>
+                <div class="input-group">
+                    <label>正确答案</label>
+                    <input type="text" id="mistake-correct-answer" placeholder="正确答案">
+                </div>
+                <button onclick="analyzeMistake()">分析错因</button>
+                <div id="analysis-result" class="result-area">等待分析...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 例题详情弹窗 -->
+    <div id="exampleModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>固体物理题库 | 基于黄昆《固体物理学》教材 | AI驱动智能学习 | 支持图片答案判题</p>
+    </footer>
+
+    <script>
+        // ========== 配置 ==========
+        const API_BASE = 'http://localhost:5000';
+
+        // 预置例题库
+        const exampleProblems = [
+    // ========== 第一章 晶体结构（1-30题）==========
+    { id: 1, chapter: "晶体结构", difficulty: "easy", title: "简立方晶胞原子数", content: "简立方晶胞中包含多少个原子？", solution: "简立方晶胞有8个顶角原子，每个顶角原子被8个晶胞共享，因此原子数 = 8 × 1/8 = 1个。" },
+    { id: 2, chapter: "晶体结构", difficulty: "easy", title: "体心立方晶胞原子数", content: "体心立方晶胞中包含多少个原子？", solution: "体心立方晶胞有8个顶角原子（共享）和1个体心原子（独有），原子数 = 8×1/8 + 1 = 2个。" },
+    { id: 3, chapter: "晶体结构", difficulty: "easy", title: "面心立方晶胞原子数", content: "面心立方晶胞中包含多少个原子？", solution: "面心立方晶胞有8个顶角原子（共享）和6个面心原子（每个被2个晶胞共享），原子数 = 8×1/8 + 6×1/2 = 4个。" },
+    { id: 4, chapter: "晶体结构", difficulty: "medium", title: "简立方空间利用率", content: "证明简立方结构的空间利用率为 π/6 ≈ 0.52。", solution: "设原子半径r，晶格常数a=2r，晶胞体积V=a³=8r³，原子体积=4πr³/3，空间利用率=(4πr³/3)/(8r³)=π/6。" },
+    { id: 5, chapter: "晶体结构", difficulty: "medium", title: "体心立方空间利用率", content: "证明体心立方结构的空间利用率为 √3π/8 ≈ 0.68。", solution: "体对角线方向原子相切：√3a=4r → a=4r/√3，晶胞含2个原子，x=2×(4πr³/3)/a³=√3π/8。" },
+    { id: 6, chapter: "晶体结构", difficulty: "medium", title: "面心立方空间利用率", content: "证明面心立方结构的空间利用率为 √2π/6 ≈ 0.74。", solution: "面对角线方向原子相切：√2a=4r → a=4r/√2，晶胞含4个原子，x=4×(4πr³/3)/a³=√2π/6。" },
+    { id: 7, chapter: "晶体结构", difficulty: "hard", title: "金刚石空间利用率", content: "证明金刚石结构的空间利用率为 √3π/16 ≈ 0.34。", solution: "体对角线方向原子相切：√3a=8r → a=8r/√3，晶胞含8个原子，x=8×(4πr³/3)/a³=√3π/16。" },
+    { id: 8, chapter: "晶体结构", difficulty: "medium", title: "六角密排c/a比值", content: "证明理想的六角密堆积结构中 c/a = √(8/3) ≈ 1.633。", solution: "正四面体高 h=√(a²-(a/√3)²)=√(2/3)a，c/2=h，故 c/a=√(8/3)。" },
+    { id: 9, chapter: "晶体结构", difficulty: "medium", title: "六角密排原胞体积", content: "证明六角密排的原胞体积为 Ω = (√3/2)a²c。", solution: "基矢：a₁=ai，a₂=a(-i/2+√3/2j)，a₃=ck，Ω=|a₁·(a₂×a₃)|=√3a²c/2。" },
+    { id: 10, chapter: "晶体结构", difficulty: "easy", title: "面心立方原子半径", content: "面心立方晶格中，晶格常数a与原子半径r的关系是什么？", solution: "最近邻距离 d=√2a/2，原子相切 2r=d，故 r=√2a/4。" },
+    { id: 11, chapter: "晶体结构", difficulty: "easy", title: "体心立方原子半径", content: "体心立方晶格中，晶格常数a与原子半径r的关系是什么？", solution: "体对角线方向原子相切：√3a=4r → r=√3a/4。" },
+    { id: 12, chapter: "晶体结构", difficulty: "easy", title: "简立方原子半径", content: "简立方晶格中，晶格常数a与原子半径r的关系是什么？", solution: "立方边方向原子相切：a=2r → r=a/2。" },
+    { id: 13, chapter: "晶体结构", difficulty: "hard", title: "金刚石键角", content: "金刚石结构中每个原子周围最近邻原子构成的键角是多少？", solution: "四面体键角 θ = arccos(-1/3) ≈ 109°28'。" },
+    { id: 14, chapter: "晶体结构", difficulty: "medium", title: "NaCl结构特点", content: "NaCl晶体属于什么晶格结构？每个晶胞包含多少个Na+和Cl-？", solution: "NaCl属于面心立方结构，可视为Na+和Cl-各自构成面心立方格子相互穿插。每个晶胞含4个Na+和4个Cl-。" },
+    { id: 15, chapter: "晶体结构", difficulty: "medium", title: "CsCl结构特点", content: "CsCl晶体属于什么晶格结构？每个晶胞包含多少个Cs+和Cl-？", solution: "CsCl属于简单立方结构，Cs+位于体心，Cl-位于顶角。每个晶胞含1个Cs+和1个Cl-。" },
+    { id: 16, chapter: "晶体结构", difficulty: "easy", title: "晶面指数定义", content: "什么是密勒指数？如何表示晶面？", solution: "密勒指数是晶面在三个晶轴上的截距倒数的互质整数比，用(hkl)表示。" },
+    { id: 17, chapter: "晶体结构", difficulty: "easy", title: "晶向指数定义", content: "什么是晶向指数？如何表示晶向？", solution: "晶向指数是从原点到最近格点的位移矢量在基矢上的投影的互质整数比，用[uvw]表示。" },
+    { id: 18, chapter: "晶体结构", difficulty: "medium", title: "晶面间距公式", content: "简单立方晶格中，晶面(hkl)的面间距d是多少？", solution: "d = a/√(h²+k²+l²)。" },
+    { id: 19, chapter: "晶体结构", difficulty: "medium", title: "(110)晶面间距", content: "简单立方晶格中，(110)晶面的面间距是多少？", solution: "d = a/√(1²+1²+0²) = a/√2。" },
+    { id: 20, chapter: "晶体结构", difficulty: "medium", title: "(111)晶面间距", content: "简单立方晶格中，(111)晶面的面间距是多少？", solution: "d = a/√(1²+1²+1²) = a/√3。" },
+    { id: 21, chapter: "晶体结构", difficulty: "easy", title: "配位数定义", content: "什么是配位数？面心立方的配位数是多少？", solution: "配位数是一个原子周围最近邻原子的数目。面心立方配位数为12。" },
+    { id: 22, chapter: "晶体结构", difficulty: "easy", title: "体心立方配位数", content: "体心立方的配位数是多少？", solution: "体心立方配位数为8。" },
+    { id: 23, chapter: "晶体结构", difficulty: "easy", title: "简立方配位数", content: "简立方的配位数是多少？", solution: "简立方配位数为6。" },
+    { id: 24, chapter: "晶体结构", difficulty: "medium", title: "六角密排配位数", content: "六角密排结构的配位数是多少？", solution: "六角密排配位数为12，与面心立方相同。" },
+    { id: 25, chapter: "晶体结构", difficulty: "hard", title: "布拉伐格子种类", content: "三维空间中有多少种布拉伐格子？", solution: "共有14种布拉伐格子，分为7个晶系。" },
+    { id: 26, chapter: "晶体结构", difficulty: "medium", title: "倒格子定义", content: "写出倒格子基矢的定义。", solution: "b₁ = 2π(a₂×a₃)/Ω，b₂ = 2π(a₃×a₁)/Ω，b₃ = 2π(a₁×a₂)/Ω，其中Ω是原胞体积。" },
+    { id: 27, chapter: "晶体结构", difficulty: "medium", title: "倒格子性质", content: "证明正格子基矢与倒格子基矢满足 a_i·b_j = 2πδ_ij。", solution: "由倒格子定义直接验证，当i=j时a_i·b_i=2π，当i≠j时a_i·b_j=0。" },
+    { id: 28, chapter: "晶体结构", difficulty: "hard", title: "面心立方倒格子", content: "证明面心立方格子的倒格子是体心立方格子。", solution: "面心立方基矢代入倒格子公式得b₁=(2π/a)(-i+j+k)等，正是体心立方基矢。" },
+    { id: 29, chapter: "晶体结构", difficulty: "hard", title: "体心立方倒格子", content: "证明体心立方格子的倒格子是面心立方格子。", solution: "体心立方基矢代入倒格子公式得面心立方基矢。" },
+    { id: 30, chapter: "晶体结构", difficulty: "medium", title: "第一布里渊区", content: "什么是第一布里渊区？", solution: "第一布里渊区是从原点出发的各倒格矢垂直平分面所围成的最小区域。" },
+
+    // ========== 第二章 固体的结合（31-50题）==========
+    { id: 31, chapter: "固体的结合", difficulty: "easy", title: "晶体结合类型", content: "固体的结合有哪几种基本类型？", solution: "离子性结合、共价结合、金属性结合、范德瓦耳斯结合、氢键结合。" },
+    { id: 32, chapter: "固体的结合", difficulty: "easy", title: "离子晶体特点", content: "离子晶体有哪些主要特点？", solution: "高熔点、硬而脆、常温下绝缘、溶于水后导电。" },
+    { id: 33, chapter: "固体的结合", difficulty: "easy", title: "共价晶体特点", content: "共价晶体有哪些主要特点？", solution: "高硬度、高熔点、不导电、方向性和饱和性。" },
+    { id: 34, chapter: "固体的结合", difficulty: "easy", title: "金属晶体特点", content: "金属晶体有哪些主要特点？", solution: "良好的导电性和导热性、延展性好、有金属光泽。" },
+    { id: 35, chapter: "固体的结合", difficulty: "easy", title: "分子晶体特点", content: "分子晶体有哪些主要特点？", solution: "低熔点、低硬度、绝缘体。" },
+    { id: 36, chapter: "固体的结合", difficulty: "medium", title: "离子晶体结合能", content: "离子晶体的结合能主要由什么决定？", solution: "主要来自正负离子间的库仑吸引能，以及近邻离子电子云重叠产生的排斥能。" },
+    { id: 37, chapter: "固体的结合", difficulty: "medium", title: "马德隆常数", content: "什么是马德隆常数？NaCl的马德隆常数是多少？", solution: "马德隆常数是离子晶体中所有离子对参考离子的库仑势之和，NaCl的α≈1.748。" },
+    { id: 38, chapter: "固体的结合", difficulty: "hard", title: "共价键饱和性", content: "什么是共价键的饱和性？", solution: "每个原子只能形成有限数量的共价键，由未配对电子数决定。" },
+    { id: 39, chapter: "固体的结合", difficulty: "hard", title: "共价键方向性", content: "什么是共价键的方向性？", solution: "共价键沿特定方向形成，由原子轨道最大重叠决定。" },
+    { id: 40, chapter: "固体的结合", difficulty: "medium", title: "sp³杂化", content: "什么是sp³杂化？举例说明。", solution: "一个s轨道和三个p轨道混合形成四个等价的杂化轨道，指向四面体顶点，如金刚石中的碳。" },
+    { id: 41, chapter: "固体的结合", difficulty: "medium", title: "sp²杂化", content: "什么是sp²杂化？举例说明。", solution: "一个s轨道和两个p轨道混合形成三个共面的杂化轨道，如石墨中的碳。" },
+    { id: 42, chapter: "固体的结合", difficulty: "medium", title: "金属键", content: "金属键的本质是什么？", solution: "价电子脱离原子成为自由电子，形成电子气，原子实浸没在电子云中。" },
+    { id: 43, chapter: "固体的结合", difficulty: "medium", title: "范德瓦耳斯力", content: "范德瓦耳斯力的来源是什么？", solution: "瞬时电偶极矩的感应作用，相互作用能U∝1/r⁶。" },
+    { id: 44, chapter: "固体的结合", difficulty: "medium", title: "勒纳-琼斯势", content: "写出勒纳-琼斯势的表达式。", solution: "U(r)=4ε[(σ/r)¹²-(σ/r)⁶]。" },
+    { id: 45, chapter: "固体的结合", difficulty: "easy", title: "负电性", content: "什么是负电性？", solution: "原子在分子中吸引电子的能力。" },
+    { id: 46, chapter: "固体的结合", difficulty: "medium", title: "负电性与结合类型", content: "负电性差如何决定结合类型？", solution: "差大→离子晶体，差小→共价晶体，差很小→金属晶体。" },
+    { id: 47, chapter: "固体的结合", difficulty: "medium", title: "电离度", content: "什么是电离度？", solution: "描述共价键中离子性成分的比例。" },
+    { id: 48, chapter: "固体的结合", difficulty: "hard", title: "结合能计算", content: "如何计算离子晶体的结合能？", solution: "U = N[-αq²/(4πε₀r) + B/rⁿ]，由dU/dr=0确定平衡位置。" },
+    { id: 49, chapter: "固体的结合", difficulty: "hard", title: "氢键", content: "什么是氢键？", solution: "氢原子与电负性大的原子（如F、O、N）形成的弱相互作用。" },
+    { id: 50, chapter: "固体的结合", difficulty: "medium", title: "混合键", content: "什么是混合键？举例说明。", solution: "同时具有两种以上结合特性的键，如石墨层内共价键、层间范德瓦耳斯力。" },
+
+    // ========== 第三章 晶格振动（51-75题）==========
+    { id: 51, chapter: "晶格振动", difficulty: "hard", title: "一维单原子链色散", content: "推导一维单原子链的色散关系ω(q)。", solution: "ω²=(4β/m)sin²(aq/2)，ω=2√(β/m)|sin(aq/2)|。" },
+    { id: 52, chapter: "晶格振动", difficulty: "medium", title: "布里渊区", content: "一维单原子链的第一布里渊区边界在哪里？", solution: "q=±π/a。" },
+    { id: 53, chapter: "晶格振动", difficulty: "medium", title: "声学波特点", content: "一维双原子链声学波有什么特点？", solution: "长波极限ω∝q，同相振动，类似弹性波。" },
+    { id: 54, chapter: "晶格振动", difficulty: "medium", title: "光学波特点", content: "一维双原子链光学波有什么特点？", solution: "长波极限ω→常数，反相振动，质心不动。" },
+    { id: 55, chapter: "晶格振动", difficulty: "easy", title: "声子概念", content: "什么是声子？", solution: "声子是晶格振动的能量量子，能量E=ℏω，准动量p=ℏq。" },
+    { id: 56, chapter: "晶格振动", difficulty: "medium", title: "声子准动量", content: "为什么声子的动量是准动量？", solution: "因为相差倒格矢时物理等价，不是真正的动量。" },
+    { id: 57, chapter: "晶格振动", difficulty: "medium", title: "声子分类", content: "声子分为哪几类？", solution: "声学声子和光学声子。" },
+    { id: 58, chapter: "晶格振动", difficulty: "easy", title: "格波", content: "什么是格波？", solution: "晶体中原子集体振动的波，是晶格振动的基本模式。" },
+    { id: 59, chapter: "晶格振动", difficulty: "medium", title: "简正坐标", content: "什么是简正坐标？", solution: "将原子振动转化为独立简谐振动的坐标变换。" },
+    { id: 60, chapter: "晶格振动", difficulty: "hard", title: "德拜模型假设", content: "德拜模型的基本假设是什么？", solution: "晶体为连续弹性介质，ω=cq，有截止频率ω_D。" },
+    { id: 61, chapter: "晶格振动", difficulty: "medium", title: "德拜T³定律", content: "德拜模型在低温下的热容与温度的关系是什么？", solution: "C_V ∝ T³。" },
+    { id: 62, chapter: "晶格振动", difficulty: "medium", title: "德拜温度", content: "什么是德拜温度？", solution: "Θ_D=ℏω_D/k_B，划分高温和低温的尺度。" },
+    { id: 63, chapter: "晶格振动", difficulty: "medium", title: "爱因斯坦模型", content: "爱因斯坦模型的基本假设是什么？", solution: "所有原子独立振动且频率相同。" },
+    { id: 64, chapter: "晶格振动", difficulty: "medium", title: "爱因斯坦模型局限", content: "爱因斯坦模型的局限性是什么？", solution: "低温下热容下降过快，与实验不符。" },
+    { id: 65, chapter: "晶格振动", difficulty: "hard", title: "非简谐效应", content: "非简谐效应导致哪些物理现象？", solution: "热膨胀、有限热导率、声子-声子散射。" },
+    { id: 66, chapter: "晶格振动", difficulty: "hard", title: "格临爱森常数", content: "什么是格临爱森常数？", solution: "γ = -dlnω/dlnV，描述频率对体积的依赖。" },
+    { id: 67, chapter: "晶格振动", difficulty: "medium", title: "晶格热导率", content: "写出晶格热导率的声子气体模型公式。", solution: "κ = (1/3)C_v v λ。" },
+    { id: 68, chapter: "晶格振动", difficulty: "hard", title: "声子散射机制", content: "影响声子平均自由程的主要散射机制有哪些？", solution: "声子-声子散射、声子-杂质散射、声子-边界散射。" },
+    { id: 69, chapter: "晶格振动", difficulty: "hard", title: "U过程", content: "什么是声子散射的U过程？", solution: "q₁+q₂=q₃+G，G为倒格矢，是热阻的主要来源。" },
+    { id: 70, chapter: "晶格振动", difficulty: "medium", title: "N过程", content: "什么是声子散射的N过程？", solution: "q₁+q₂=q₃，不改变热流方向，不产生热阻。" },
+    { id: 71, chapter: "晶格振动", difficulty: "medium", title: "光学支数目", content: "三维晶体中光学支的数目是多少？", solution: "若原胞含n个原子，则有3n-3支光学波。" },
+    { id: 72, chapter: "晶格振动", difficulty: "medium", title: "声学支数目", content: "三维晶体中声学支的数目是多少？", solution: "3支声学波（1纵2横）。" },
+    { id: 73, chapter: "晶格振动", difficulty: "hard", title: "LST关系", content: "什么是LST关系？", solution: "ω_LO²/ω_TO² = ε(0)/ε(∞)，描述纵光学波与横光学波频率比。" },
+    { id: 74, chapter: "晶格振动", difficulty: "hard", title: "极化激元", content: "什么是极化激元？", solution: "格波与电磁波耦合形成的混合模式。" },
+    { id: 75, chapter: "晶格振动", difficulty: "medium", title: "中子散射", content: "为什么中子散射是研究晶格振动谱的主要方法？", solution: "中子能量与声子同量级，波长与晶格常数同量级。" },
+
+    // ========== 第四章 能带理论（76-100题）==========
+    { id: 76, chapter: "能带理论", difficulty: "hard", title: "布洛赫定理", content: "写出布洛赫定理的表达式并说明物理意义。", solution: "ψ(r+R)=e^{ik·R}ψ(r)，表明周期场中电子波函数是调幅平面波。" },
+    { id: 77, chapter: "能带理论", difficulty: "medium", title: "布洛赫函数", content: "什么是布洛赫函数？", solution: "ψ_k(r)=e^{ik·r}u_k(r)，其中u_k(r)是周期函数。" },
+    { id: 78, chapter: "能带理论", difficulty: "easy", title: "能带", content: "什么是能带？", solution: "周期场中电子的准连续能级。" },
+    { id: 79, chapter: "能带理论", difficulty: "easy", title: "带隙", content: "什么是带隙？", solution: "能带之间的能量禁区，电子不能占据。" },
+    { id: 80, chapter: "能带理论", difficulty: "medium", title: "近自由电子近似", content: "近自由电子近似的基本思想是什么？", solution: "将周期势场的平均值作为零级近似，起伏作为微扰。" },
+    { id: 81, chapter: "能带理论", difficulty: "medium", title: "紧束缚近似", content: "紧束缚近似的基本思想是什么？", solution: "电子紧束缚在原子附近，用原子轨道线性组合。" },
+    { id: 82, chapter: "能带理论", difficulty: "medium", title: "导体能带", content: "根据能带论，导体的能带结构有什么特点？", solution: "有部分填充的能带，电子可自由运动。" },
+    { id: 83, chapter: "能带理论", difficulty: "medium", title: "绝缘体能带", content: "根据能带论，绝缘体的能带结构有什么特点？", solution: "满带和空带之间有很大的带隙（>3eV）。" },
+    { id: 84, chapter: "能带理论", difficulty: "medium", title: "半导体能带", content: "根据能带论，半导体的能带结构有什么特点？", solution: "满带和空带之间带隙较小（<3eV）。" },
+    { id: 85, chapter: "能带理论", difficulty: "medium", title: "有效质量", content: "什么是电子的有效质量？", solution: "m* = ℏ²/(d²E/dk²)，反映周期势场对电子运动的影响。" },
+    { id: 86, chapter: "能带理论", difficulty: "hard", title: "能态密度", content: "什么是能态密度？", solution: "单位能量间隔内的状态数，g(E)=dN/dE。" },
+    { id: 87, chapter: "能带理论", difficulty: "hard", title: "三维自由电子能态密度", content: "三维自由电子气的能态密度与能量的关系？", solution: "g(E) ∝ E^{1/2}。" },
+    { id: 88, chapter: "能带理论", difficulty: "hard", title: "二维自由电子能态密度", content: "二维自由电子气的能态密度与能量的关系？", solution: "g(E) = 常数（与能量无关）。" },
+    { id: 89, chapter: "能带理论", difficulty: "hard", title: "一维自由电子能态密度", content: "一维自由电子气的能态密度与能量的关系？", solution: "g(E) ∝ E^{-1/2}。" },
+    { id: 90, chapter: "能带理论", difficulty: "medium", title: "费米能级", content: "什么是费米能级？", solution: "绝对零度时电子占据的最高能级。" },
+    { id: 91, chapter: "能带理论", difficulty: "medium", title: "费米面", content: "什么是费米面？", solution: "k空间中费米能级对应的等能面。" },
+    { id: 92, chapter: "能带理论", difficulty: "hard", title: "布里渊区", content: "什么是布里渊区？", solution: "k空间中由倒格矢垂直平分面围成的区域。" },
+    { id: 93, chapter: "能带理论", difficulty: "medium", title: "简约布里渊区", content: "什么是简约布里渊区？", solution: "第一布里渊区，k的取值唯一区域。" },
+    { id: 94, chapter: "能带理论", difficulty: "hard", title: "能带交叠", content: "什么是能带交叠？", solution: "不同能带在能量上重叠的现象，常见于三维晶体。" },
+    { id: 95, chapter: "能带理论", difficulty: "hard", title: "空穴", content: "什么是空穴？", solution: "满带顶附近空状态等效的正电荷准粒子。" },
+    { id: 96, chapter: "能带理论", difficulty: "medium", title: "空穴性质", content: "空穴有哪些性质？", solution: "带正电荷+e，有效质量为正，位于满带顶。" },
+    { id: 97, chapter: "能带理论", difficulty: "hard", title: "回旋共振", content: "什么是回旋共振？有什么用途？", solution: "交变电场频率等于回旋频率时发生共振吸收，用于测量有效质量。" },
+    { id: 98, chapter: "能带理论", difficulty: "hard", title: "德哈斯-范阿尔芬效应", content: "什么是德哈斯-范阿尔芬效应？", solution: "低温强磁场下磁化率随磁场振荡的现象，用于研究费米面。" },
+    { id: 99, chapter: "能带理论", difficulty: "medium", title: "霍尔效应", content: "什么是霍尔效应？", solution: "载流子在磁场中受到洛伦兹力产生横向电压。" },
+    { id: 100, chapter: "能带理论", difficulty: "hard", title: "能带计算", content: "常见的能带计算方法有哪些？", solution: "近自由电子近似、紧束缚近似、赝势法、密度泛函理论。" }
+];
+
+        let userMistakes = JSON.parse(localStorage.getItem('solid_mistakes') || '[]');
+        let currentQuestions = [];
+        let currentImageFile = null;
+
+        // 渲染公式
+        function renderMathInElement(element) {
+            if (window.MathJax) {
+                MathJax.typesetPromise([element]);
+            }
+        }
+
+        // 检查后端连接
+        async function checkBackend() {
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                if (response.ok) {
+                    console.log('后端服务已连接');
+                }
+            } catch (e) {
+                console.log('后端服务未启动');
+            }
+        }
+
+        // 弹窗控制
+        function showModal(title, content) {
+            const modal = document.getElementById('exampleModal');
+            document.getElementById('modalTitle').innerHTML = title;
+            document.getElementById('modalBody').innerHTML = content;
+            modal.classList.add('show');
+            if (window.MathJax) {
+                MathJax.typesetPromise([document.getElementById('modalBody')]);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('exampleModal').classList.remove('show');
+        }
+
+        // 点击模态框背景关闭
+        document.getElementById('exampleModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // 切换页面
+        function switchSection(section) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (section === 'example') {
+                document.getElementById('example-section').classList.add('active');
+                document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
+                renderExampleList();
+            } else if (section === 'practice') {
+                document.getElementById('practice-section').classList.add('active');
+                document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
+            } else if (section === 'mistakes') {
+                document.getElementById('mistakes-section').classList.add('active');
+                document.querySelector('.nav-btn:nth-child(3)').classList.add('active');
+                renderMistakesList();
+            } else if (section === 'ai') {
+                document.getElementById('ai-section').classList.add('active');
+                document.querySelector('.nav-btn:nth-child(4)').classList.add('active');
+            }
+        }
+
+        // 渲染例题列表
+        function renderExampleList() {
+            const container = document.getElementById('example-list');
+            container.innerHTML = exampleProblems.map(p => `
+                <div class="question-item" onclick="showExampleDetail(${p.id})">
+                    <div class="question-title">${p.title}</div>
+                    <div class="question-meta">
+                        <span>📖 ${p.chapter}</span>
+                        <span>${p.difficulty === 'easy' ? '⭐ 基础' : p.difficulty === 'medium' ? '⭐⭐ 中等' : '⭐⭐⭐ 困难'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showExampleDetail(id) {
+            const p = exampleProblems.find(q => q.id === id);
+            const modalContent = `
+                <div class="question-text">
+                    <strong>📝 题目</strong><br><br>
+                    ${p.content}
+                </div>
+                <div class="solution-text">
+                    <strong>✅ 解析</strong><br><br>
+                    ${p.solution}
+                </div>
+            `;
+            showModal(p.title, modalContent);
+        }
+
+        // 刷题功能
+        function startPractice() {
+            const chapter = document.getElementById('practice-chapter').value;
+            const difficulty = document.getElementById('practice-difficulty').value;
+            
+            let filtered = [...exampleProblems];
+            if (chapter !== 'all') {
+                filtered = filtered.filter(p => p.chapter === chapter);
+            }
+            if (difficulty !== 'all') {
+                filtered = filtered.filter(p => p.difficulty === difficulty);
+            }
+            
+            if (filtered.length === 0) {
+                alert('没有符合条件的题目，请调整筛选条件');
+                return;
+            }
+            
+            currentQuestions = filtered;
+            loadNextQuestion(0);
+        }
+
+        function loadNextQuestion(index) {
+            if (index >= currentQuestions.length) {
+                document.getElementById('practice-area').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <p>🎉 恭喜！您已完成本轮所有题目！</p>
+                        <button onclick="startPractice()" style="margin-top: 16px;">开始新一轮</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            currentImageFile = null;
+            renderPracticeQuestion(currentQuestions[index], index);
+        }
+
+        function renderPracticeQuestion(question, index) {
+            document.getElementById('practice-area').innerHTML = `
+                <div class="practice-question">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <span>第 ${index + 1}/${currentQuestions.length} 题</span>
+                        <span>${question.difficulty === 'easy' ? '⭐ 基础' : question.difficulty === 'medium' ? '⭐⭐ 中等' : '⭐⭐⭐ 困难'}</span>
+                    </div>
+                    <div class="question-text">
+                        <strong>📝 ${question.title}</strong><br><br>
+                        ${question.content}
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>✏️ 文字答案（可选）</label>
+                        <textarea id="practice-answer" class="answer-input" rows="4" placeholder="请输入你的答案..."></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>📷 上传答案图片（可选，支持拍照或相册）</label>
+                        <input type="file" id="answer-image" accept="image/*" capture="environment">
+                        <div id="image-preview" class="image-preview">
+                            <img id="preview-img" class="preview-img">
+                            <button type="button" onclick="clearImage()" style="margin-top: 8px; padding: 5px 12px; font-size: 12px; background: #dc2626;">清除图片</button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <button onclick="submitPracticeAnswer(${index})">📤 提交答案（AI判题）</button>
+                        <button onclick="skipQuestion(${index})" style="background: #64748b;">⏭️ 跳过</button>
+                    </div>
+                    <div id="practice-feedback" class="feedback"></div>
+                </div>
+            `;
+            
+            // 绑定图片上传事件
+            const imageInput = document.getElementById('answer-image');
+            if (imageInput) {
+                imageInput.onchange = function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        currentImageFile = file;
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            const preview = document.getElementById('image-preview');
+                            const img = document.getElementById('preview-img');
+                            preview.classList.add('show');
+                            img.src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+            }
+            
+            renderMathInElement(document.getElementById('practice-area'));
+        }
+
+        function clearImage() {
+            currentImageFile = null;
+            document.getElementById('answer-image').value = '';
+            document.getElementById('image-preview').classList.remove('show');
+        }
+
+        async function submitPracticeAnswer(index) {
+            const question = currentQuestions[index];
+            const userAnswer = document.getElementById('practice-answer')?.value.trim() || '';
+            const hasImage = currentImageFile !== null;
+            
+            if (!userAnswer && !hasImage) {
+                alert('请输入答案或上传图片');
+                return;
+            }
+            
+            const feedbackDiv = document.getElementById('practice-feedback');
+            feedbackDiv.innerHTML = '<div class="loading">🤖 AI正在判题，请稍等...</div>';
+            feedbackDiv.classList.add('show');
+            
+            const formData = new FormData();
+            formData.append('question', question.content);
+            formData.append('correct_answer', question.solution);
+            formData.append('user_answer', userAnswer);
+            
+            if (hasImage) {
+                formData.append('image', currentImageFile);
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/grade-image`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.correct) {
+                        feedbackDiv.className = 'feedback show feedback-correct';
+                        feedbackDiv.innerHTML = `
+                            <strong>✅ 回答正确！</strong><br><br>
+                            📊 得分: ${data.score}/10<br><br>
+                            📝 分析: ${data.analysis}<br><br>
+                            💡 建议: ${data.suggestion || '继续保持！'}
+                        `;
+                        renderMathInElement(feedbackDiv);
+                        setTimeout(() => {
+                            loadNextQuestion(index + 1);
+                        }, 3000);
+                    } else {
+                        feedbackDiv.className = 'feedback show feedback-wrong';
+                        feedbackDiv.innerHTML = `
+                            <strong>❌ 回答错误</strong><br><br>
+                            📊 得分: ${data.score}/10<br><br>
+                            📝 分析: ${data.analysis}<br><br>
+                            💡 建议: ${data.suggestion || '建议复习相关知识点'}<br><br>
+                            📖 参考答案: ${question.solution}
+                        `;
+                        renderMathInElement(feedbackDiv);
+                    }
+                } else {
+                    feedbackDiv.innerHTML = `❌ 判题失败: ${data.error}`;
+                }
+            } catch (error) {
+                feedbackDiv.innerHTML = `❌ 网络错误: ${error.message}`;
+            }
+        }
+
+        function skipQuestion(index) {
+            loadNextQuestion(index + 1);
+        }
+
+        // 错题本功能
+        function renderMistakesList() {
+            const container = document.getElementById('mistakes-list');
+            if (userMistakes.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748b;">暂无错题</div>';
+                return;
+            }
+            
+            container.innerHTML = userMistakes.map(m => `
+                <div class="question-item" onclick="showMistakeDetail(${m.id})">
+                    <div class="question-title">${m.title}</div>
+                    <div class="question-meta">
+                        <span>📖 ${m.chapter}</span>
+                        <span>${m.difficulty === 'easy' ? '⭐ 基础' : m.difficulty === 'medium' ? '⭐⭐ 中等' : '⭐⭐⭐ 困难'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showMistakeDetail(id) {
+            const mistake = userMistakes.find(m => m.id === id);
+            if (mistake) {
+                const modalContent = `
+                    <div class="question-text">
+                        <strong>📝 题目</strong><br><br>
+                        ${mistake.content}
+                    </div>
+                    <div class="solution-text">
+                        <strong>✅ 解析</strong><br><br>
+                        ${mistake.solution}<br><br>
+                        💡 提示：建议重新练习巩固知识点。
+                    </div>
+                `;
+                showModal(mistake.title, modalContent);
+            }
+        }
+
+        function clearMistakes() {
+            if (confirm('确定要清空错题本吗？')) {
+                userMistakes = [];
+                localStorage.setItem('solid_mistakes', JSON.stringify(userMistakes));
+                renderMistakesList();
+            }
+        }
+
+        // AI功能
+        function renderAIResult(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = content;
+            if (window.MathJax) {
+                MathJax.typesetPromise([element]);
+            }
+        }
+
+        async function sendChat() {
+            const message = document.getElementById('chat-input').value.trim();
+            if (!message) {
+                alert('请输入问题');
+                return;
+            }
+            
+            renderAIResult('chat-result', '<div class="loading">AI正在思考</div>');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    renderAIResult('chat-result', data.reply);
+                } else {
+                    renderAIResult('chat-result', `❌ 错误: ${data.error}`);
+                }
+            } catch (error) {
+                renderAIResult('chat-result', `❌ 无法连接后端服务\n\n错误: ${error.message}`);
+            }
+        }
+
+        async function explainConcept() {
+            const concept = document.getElementById('concept-input').value.trim();
+            if (!concept) {
+                alert('请输入概念名称');
+                return;
+            }
+            
+            renderAIResult('concept-result', '<div class="loading">AI正在解释</div>');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/explain-concept`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ concept: concept })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    renderAIResult('concept-result', data.explanation);
+                } else {
+                    renderAIResult('concept-result', `❌ 错误: ${data.error}`);
+                }
+            } catch (error) {
+                renderAIResult('concept-result', `❌ 无法连接后端服务\n\n错误: ${error.message}`);
+            }
+        }
+
+        async function aiGenerateQuestion() {
+            const knowledge = document.getElementById('ai-knowledge').value.trim();
+            const type = document.getElementById('ai-type').value;
+            
+            if (!knowledge) {
+                alert('请输入知识点');
+                return;
+            }
+            
+            const practiceArea = document.getElementById('practice-area');
+            practiceArea.innerHTML = '<div class="loading">AI正在生成题目</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/generate-question`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ knowledge: knowledge, type: type, difficulty: 'medium' })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    practiceArea.innerHTML = `
+                        <div class="practice-question">
+                            <div class="question-text">
+                                ${data.question.replace(/\n/g, '<br>')}
+                            </div>
+                            <div style="margin-top: 16px; color: #64748b; font-size: 13px;">
+                                🤖 AI生成的题目，请在纸上作答后对照答案
+                            </div>
+                        </div>
+                    `;
+                    renderMathInElement(practiceArea);
+                } else {
+                    practiceArea.innerHTML = `<div style="color: red;">❌ 生成失败: ${data.error}</div>`;
+                }
+            } catch (error) {
+                practiceArea.innerHTML = `<div style="color: red;">❌ 无法连接后端服务\n\n错误: ${error.message}</div>`;
+            }
+        }
+
+        async function analyzeMistake() {
+            const question = document.getElementById('mistake-question').value.trim();
+            const userAnswer = document.getElementById('mistake-user-answer').value.trim();
+            const correctAnswer = document.getElementById('mistake-correct-answer').value.trim();
+            
+            if (!question) {
+                alert('请输入题目');
+                return;
+            }
+            
+            renderAIResult('analysis-result', '<div class="loading">AI正在分析</div>');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/analyze-mistake`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question, user_answer: userAnswer, correct_answer: correctAnswer })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    renderAIResult('analysis-result', data.analysis);
+                } else {
+                    renderAIResult('analysis-result', `❌ 错误: ${data.error}`);
+                }
+            } catch (error) {
+                renderAIResult('analysis-result', `❌ 无法连接后端服务\n\n错误: ${error.message}`);
+            }
+        }
+
+        // 添加错题到错题本
+        function addToMistakes(question) {
+            if (!userMistakes.some(m => m.id === question.id)) {
+                userMistakes.push({ ...question, addedAt: new Date().toISOString() });
+                localStorage.setItem('solid_mistakes', JSON.stringify(userMistakes));
+                renderMistakesList();
+                alert('已加入错题本');
+            } else {
+                alert('该题已在错题本中');
+            }
+        }
+
+        // 初始化
+        renderExampleList();
+        renderMistakesList();
+        checkBackend();
+    </script>
+</body>
+</html>
